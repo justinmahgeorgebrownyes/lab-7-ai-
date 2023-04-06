@@ -7,14 +7,14 @@
 class LOSCondition : public ConditionNode
 {
 public:
-	LOSCondition(bool LOS = false);
+	LOSCondition(Agent* agent = nullptr);
 	virtual ~LOSCondition();
 
 	// Setter
-	void SetLOS(bool state);
+	//void SetLOS(bool state);
 
 	virtual bool Condition() override;
-private:
-	bool m_hasLOS{};
+//private:
+	//bool m_hasLOS{};
 };
 #endif /* defined (__LOS_CONDITION__) */

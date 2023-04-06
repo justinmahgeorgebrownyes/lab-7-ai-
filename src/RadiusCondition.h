@@ -7,7 +7,7 @@
 class RadiusCondition : public ConditionNode
 {
 public:
-	RadiusCondition(bool within_radius = false);
+	RadiusCondition(Agent* agent, bool within_radius = false);
 	virtual ~RadiusCondition();
 
 	// Setter
