@@ -11,7 +11,7 @@
 
 // New for Lab 7.1
 #include "Background.h"
-#include "DecisionTree.h"
+//#include "DecisionTree.h"
 
 
 class PlayScene : public Scene
@@ -64,7 +64,7 @@ private:
 	bool m_bDebugView;
 
 	// Decision Tree
-	DecisionTree* m_decisionTree;
+	//DecisionTree* m_decisionTree;
 };
 
 #endif /* defined (__PLAY_SCENE__) */
