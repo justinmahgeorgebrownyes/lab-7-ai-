@@ -1,15 +1,24 @@
-#include "StarShip.h"
+#include "CloseCombatEnemy.h"
 
 #include "Game.h"
 #include "TextureManager.h"
 #include "Util.h"
+#include "EventManager.h"
+#include "ActionNode.h"
 
-StarShip::StarShip() : m_maxSpeed(20.0f),
+#include "PatrolAction.h"
+#include "MoveToLOSAction.h"
+#include "AttackAction.h"
+#include "ActionNode.h"
+#include "MoveToLOSAction.h"
+#include "MoveToPlayerAction.h"
+
+CloseCombatEnemy::CloseCombatEnemy() : m_maxSpeed(20.0f),
 m_turnRate(5.0f), m_accelerationRate(2.0f), m_startPosition(glm::vec2(300.0f, 500.0f))
 {
-	TextureManager::Instance().Load("../Assets/textures/ncl_small.png", "starship");
+	TextureManager::Instance().Load("../Assets/textures/d7_small.png", "close_combat_enemy");
 
-	const auto size = TextureManager::Instance().GetTextureSize("starship");
+	const auto size = TextureManager::Instance().GetTextureSize("close_combat_enemy");
 	SetWidth(static_cast<int>(size.x));
 	SetHeight(static_cast<int>(size.y));
 	GetTransform()->position = glm::vec2(0.0f, 0.0f);
@@ -29,26 +38,41 @@ m_turnRate(5.0f), m_accelerationRate(2.0f), m_startPosition(glm::vec2(300.0f, 50
 	// New for Lab 7.1
 	SetActionState(ActionState::NO_ACTION);
 	m_buildPatrolPath();
+
+	// New for Lab 7.2
+	m_tree = new DecisionTree(this); // Create a new Tree 
+	m_buildTree();
+	m_tree->Display();
+	//AI Brain
 }
 
-StarShip::~StarShip()
+CloseCombatEnemy::~CloseCombatEnemy()
 = default;
 
-void StarShip::Draw()
+void CloseCombatEnemy::Draw()
 {
-	// draw the StarShip
-	TextureManager::Instance().Draw("starship", 
+	// draw the CloseCombatEnemy
+	TextureManager::Instance().Draw("close_combat_enemy", 
 		GetTransform()->position, static_cast<double>(GetCurrentHeading()), 255, true);
 
-	// draw the LOS Line
-	Util::DrawLine(GetTransform()->position,
-		GetTransform()->position + GetCurrentDirection() * GetLOSDistance(), GetLOSColour());
+
+	if (EventManager::Instance().IsIMGUIActive()) {
+		// draw the LOS Line
+		Util::DrawLine(GetTransform()->position + GetCurrentDirection() * 0.5f * static_cast<float>(GetWidth()),
+			GetTransform()->position + GetCurrentDirection() * GetLOSDistance(), GetLOSColour());
+	}
+
+
+
+	
 }
 
-void StarShip::Update()
+void CloseCombatEnemy::Update()
 {
 	// Determine which action to perform
-	switch(GetActionState())
+
+	m_tree->MakeDecision();
+	/*switch(GetActionState())
 	{
 	case ActionState::ATTACK:
 		break;
@@ -59,54 +83,54 @@ void StarShip::Update()
 	case ActionState::PATROL:
 		m_move();
 		break;
-	}
+	}*/
 }
 
-void StarShip::Clean()
+void CloseCombatEnemy::Clean()
 {
 }
 
-float StarShip::GetMaxSpeed() const
+float CloseCombatEnemy::GetMaxSpeed() const
 {
 	return m_maxSpeed;
 }
 
-float StarShip::GetTurnRate() const
+float CloseCombatEnemy::GetTurnRate() const
 {
 	return m_turnRate;
 }
 
-float StarShip::GetAccelerationRate() const
+float CloseCombatEnemy::GetAccelerationRate() const
 {
 	return m_accelerationRate;
 }
 
-glm::vec2 StarShip::GetDesiredVelocity() const
+glm::vec2 CloseCombatEnemy::GetDesiredVelocity() const
 {
 	return m_desiredVelocity;
 }
 
-void StarShip::SetMaxSpeed(const float speed)
+void CloseCombatEnemy::SetMaxSpeed(const float speed)
 {
 	m_maxSpeed = speed;
 }
 
-void StarShip::SetTurnRate(const float angle)
+void CloseCombatEnemy::SetTurnRate(const float angle)
 {
 	m_turnRate = angle;
 }
 
-void StarShip::SetAccelerationRate(const float rate)
+void CloseCombatEnemy::SetAccelerationRate(const float rate)
 {
 	m_accelerationRate = rate;
 }
 
-void StarShip::SetDesiredVelocity(const glm::vec2 target_position)
+void CloseCombatEnemy::SetDesiredVelocity(const glm::vec2 target_position)
 {
 	m_desiredVelocity = Util::Normalize(target_position - GetTransform()->position);
 }
 
-void StarShip::Seek()
+void CloseCombatEnemy::Seek()
 {
 	// New for Lab 7.1
 	// Find Next Waypoint if within 10px of the current waypoint
@@ -131,7 +155,7 @@ void StarShip::Seek()
 	GetRigidBody()->acceleration = GetCurrentDirection() * GetAccelerationRate();
 }
 
-void StarShip::LookWhereYoureGoing(const glm::vec2 target_direction)
+void CloseCombatEnemy::LookWhereYoureGoing(const glm::vec2 target_direction)
 {
 	float target_rotation = Util::SignedAngle(GetCurrentDirection(), target_direction) -90.0f;
 
@@ -165,12 +189,41 @@ void StarShip::LookWhereYoureGoing(const glm::vec2 target_direction)
 	UpdateWhiskers(GetWhiskerAngle());
 }
 
-void StarShip::Reset()
+void CloseCombatEnemy::Reset()
 {
 	GetTransform()->position = m_startPosition;
 }
 
-void StarShip::m_move()
+void CloseCombatEnemy::Patrol()
+{
+
+	if (GetActionState() != ActionState::PATROL)
+	{
+		
+		// Initialize the Action
+			SetActionState(ActionState::PATROL);
+	}
+	m_move();
+
+}
+
+void CloseCombatEnemy::MoveToPlayer()
+{
+	if (GetActionState() != ActionState:: MOVE_TO_PLAYER)
+	{
+
+		// Initialize the Action
+		SetActionState(ActionState::MOVE_TO_PLAYER);
+		//TODO: setup another action to take when moving to the player
+	}
+}
+
+DecisionTree* CloseCombatEnemy::GetTree() const
+{
+	return m_tree;
+}
+
+void CloseCombatEnemy::m_move()
 {
 	Seek();
 
@@ -201,11 +254,49 @@ void StarShip::m_move()
 	GetRigidBody()->velocity = Util::Clamp(GetRigidBody()->velocity, GetMaxSpeed());
 }
 
-void StarShip::m_buildPatrolPath()
+void CloseCombatEnemy::m_buildPatrolPath()
 {
 	m_patrolPath.emplace_back(760, 40); // Top-Right Corner of the Screen
 	m_patrolPath.emplace_back(760, 560); // Bottom-Right Corner of the Screen
 	m_patrolPath.emplace_back(40, 560); // Bottom-Leeft Corner of the Screen
 	m_patrolPath.emplace_back(40, 40); // Top-Left Corner of the Screen
 	SetTargetPosition(m_patrolPath[m_wayPoint]);
+}
+
+void CloseCombatEnemy::m_buildTree()
+{
+	
+
+
+	// Conditions
+ // Create and Add the Root Node
+	m_tree->SetLOSNode(new LOSCondition());
+	m_tree->GetTree().push_back(m_tree->GetLOSNode());
+	m_tree->SetRadiusNode(new RadiusCondition());
+	m_tree->AddNode(m_tree->GetLOSNode(), m_tree->GetRadiusNode(), TreeNodeType::LEFT_TREE_NODE);
+	m_tree->GetTree().push_back(m_tree->GetRadiusNode());
+	m_tree->SetCloseCombatNode(new CloseCombatCondition());
+	m_tree->AddNode(m_tree->GetLOSNode(), m_tree->GetCloseCombatNode(), TreeNodeType::RIGHT_TREE_NODE);
+	m_tree->GetTree().push_back(m_tree->GetCloseCombatNode());
+	// Actions
+	// Left Sub-Tree
+	TreeNode* patrolNode = m_tree->AddNode(m_tree->GetRadiusNode(), new PatrolAction(), TreeNodeType:: LEFT_TREE_NODE);
+	dynamic_cast<ActionNode*>(patrolNode)->SetAgent(this);
+	m_tree->GetTree().push_back(patrolNode);
+
+
+	TreeNode* moveToLOSNode = m_tree->AddNode(m_tree->GetRadiusNode(), new MoveToLOSAction(), TreeNodeType::RIGHT_TREE_NODE);
+	dynamic_cast<ActionNode*>(moveToLOSNode)->SetAgent(this);
+	m_tree->GetTree().push_back(moveToLOSNode);
+
+	// Right Sub-Tree
+	TreeNode* moveToPlayerNode = m_tree-> AddNode(m_tree->GetCloseCombatNode(), new MoveToPlayerAction(), TreeNodeType::LEFT_TREE_NODE);
+	dynamic_cast<ActionNode*>(moveToPlayerNode)->SetAgent(this);
+
+	m_tree->GetTree().push_back(moveToPlayerNode);
+
+
+	TreeNode* attackNode = m_tree->AddNode(m_tree->GetCloseCombatNode(), new AttackAction(), TreeNodeType::RIGHT_TREE_NODE);
+	dynamic_cast<ActionNode*>(attackNode)->SetAgent(this);
+	m_tree->GetTree().push_back(attackNode);
 }

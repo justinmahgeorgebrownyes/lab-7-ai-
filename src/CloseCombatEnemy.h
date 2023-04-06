@@ -1,16 +1,17 @@
 #pragma once
-#ifndef __STARSHIP__
-#define __STARSHIP__
+#ifndef __CLOSE_COMBAT_ENEMY__
+#define __CLOSE_COMBAT_ENEMY__
 
 #include "Agent.h"
-class StarShip : public Agent
+#include "DecisionTree.h"
+class CloseCombatEnemy : public Agent
 {
 public:
 	// Constructor Function
-	StarShip();
+	CloseCombatEnemy();
 
 	// Destructor Function
-	~StarShip();
+	~CloseCombatEnemy();
 
 	// LifeCycle Functions
 	void Draw() override;
@@ -33,6 +34,11 @@ public:
 	void LookWhereYoureGoing(glm::vec2 target_direction);
 	void Reset();
 
+	// New for Lab 7.2
+	void Patrol() override;
+	void MoveToPlayer() override;
+	[[nodiscard]] DecisionTree* GetTree() const;
+
 private:
 	// private movement variables
 	float m_maxSpeed;
@@ -51,7 +57,11 @@ private:
 	int m_wayPoint;
 	void m_buildPatrolPath();
 
+	// New for Lab 7.2 
+	DecisionTree* m_tree;
+	void m_buildTree();
+
 };
 
-#endif /* defined (__STARSHIP__)*/
+#endif /* defined (__CLOSE_COMBAT_ENEMY__)*/
 
