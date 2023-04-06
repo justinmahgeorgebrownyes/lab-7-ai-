@@ -12,7 +12,7 @@ FleeAction::~FleeAction()
 
 void FleeAction::Action()
 {
-	if(GetAgent()->GetActionState() != ActionState::ATTACK)
+	if(GetAgent()->GetActionState() != ActionState::FLEE)
 	{
 		std::cout << "Performing " << m_name << std::endl;
 		GetAgent()->SetActionState(ActionState::FLEE);
