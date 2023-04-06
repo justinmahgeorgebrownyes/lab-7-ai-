@@ -40,6 +40,17 @@ public:
 	//void MoveToPlayer() override;
 	[[nodiscard]] DecisionTree* GetTree() const;
 
+	//7.3
+
+	// New for Lab 7.3 
+	void Flee() override;
+	void MoveToLOS() override;
+	void MoveToCover() override;
+	void WaitBehindCover() override;
+	void Attack() override;
+
+	DecisionTree* GetTree();
+
 private:
 	// private movement variables
 	float m_maxSpeed;

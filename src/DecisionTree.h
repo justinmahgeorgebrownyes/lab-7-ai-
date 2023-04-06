@@ -46,7 +46,7 @@ public:
 	void SetRangedCombatNode(RangedCombatCondition* node);
 
 	// New For Lab 7.3
-	EnemyHealthCondition* GetEnemvHealthNode() const;
+	EnemyHealthCondition* GetEnemyHealthNode() const;
 	EnemyHitCondition* GetEnemyHitNode() const;
 	PlayerDetectedCondition* GetPlayerDetectedNode() const;
 
