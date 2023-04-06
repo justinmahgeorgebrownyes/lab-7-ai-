@@ -32,6 +32,8 @@ public:
 	RadiusCondition* GetRadiusNode() const;
 	CloseCombatCondition* GetCloseCombatNode() const;
 
+	RangedCombatCondition* GetRangedCombatNode();
+
 	// New For Lab 7.2
 	std::vector<TreeNode*>& GetTree();
 	void SetLOSNode(LOSCondition* node);

@@ -48,6 +48,11 @@ CloseCombatCondition* DecisionTree::GetCloseCombatNode() const
 	return m_CloseCombatNode;
 }
 
+RangedCombatCondition* DecisionTree::GetRangedCombatNode()
+{
+	return m_RangedCombatNode;
+}
+
 std::vector<TreeNode*>& DecisionTree::GetTree()
 {
 	// TODO: insert return statement here

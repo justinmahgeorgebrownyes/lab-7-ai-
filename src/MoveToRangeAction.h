@@ -1,16 +1,16 @@
 #pragma once
-#ifndef __MOVE_TO_PLAYER_ACTION__
-#define __MOVE_TO_PLAYER_ACTION__
+#ifndef __MOVE_TO_RANGE_ACTION__
+#define __MOVE_TO_RANGE_ACTION__
 
 #include "ActionNode.h"
 
-class MoveToPlayerAction : public ActionNode
+class MoveToRangeAction : public ActionNode
 {
 public:
-	MoveToPlayerAction();
-	virtual ~MoveToPlayerAction();
+	MoveToRangeAction();
+	virtual ~MoveToRangeAction();
 
 	virtual void Action() override; // Define our action here
 };
 
-#endif /* defined (__MOVE_TO_PLAYER_ACTION__) */
+#endif /* defined (__MOVE_TO_RANGE_ACTION__) */
