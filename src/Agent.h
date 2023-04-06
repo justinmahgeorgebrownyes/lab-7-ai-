@@ -57,6 +57,12 @@ public:
 	void SetLineColour(int index, glm::vec4 colour);
 	void SetWhiskerAngle(float angle);
 
+
+	//7.3
+	int GetHealth();
+	void SetHealth(int value);
+	void TakeDamage(int value);
+
 	// utility function
 	void UpdateWhiskers(float angle);
 
@@ -73,6 +79,11 @@ public:
 	virtual void MoveToPlayer() {}
 	virtual void MoveToRange() {}
 	virtual void Patrol() {}
+	//7.3
+	virtual void Flee(){}
+	virtual void MoveToCover(){}
+	virtual void WaitBehindCover(){}
+	
 
 private:
 	void ChangeDirection();
@@ -98,6 +109,8 @@ private:
 	// New for Lab 7.1
 	ActionState m_actionState;
 
+	//7.3
+	int m_health = 100;
 };
 
 
